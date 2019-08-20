@@ -1,0 +1,44 @@
+version: '3'
+services:
+  mysql:
+    image: mysql
+    container_name: qbo_integration_db
+    ports:
+      - 33062:3306
+    environment:
+      MYSQL_DATABASE: qbo_integration_db
+      MYSQL_ROOT_PASSWORD: root
+
+  # redis:
+  #   image: redis:alpine
+  #   container_name: pos_inventory_redis
+
+  php:
+    image: qbo_integration_app
+    container_name: qbo_integration_app
+    build:
+      context: .
+      dockerfile: ./docker/php/Dockerfile
+    depends_on:
+      - mysql
+      # - redis
+    volumes:
+      - .:/var/www/html
+    environment:
+      APP_ENV: local
+      CONTAINER_ROLE: qbo_integration_app
+      # CACHE_DRIVER: redis
+      # SESSION_DRIVER: redis
+      # QUEUE_DRIVER: redis
+      # REDIS_HOST: redis
+      
+  nginx:
+    image: nginx:alpine
+    container_name: qbo_integration_nginx
+    volumes:
+      - .:/var/www/html
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - php
+    ports:
+      - 8091:80
