@@ -1,9 +1,11 @@
-#POS INVENTORY MICROSERVICE API
-This repo is a microservice for POS inventory.
+#QUICKBOOKS INTEGRATION
+A sample code for quickbooks integration using laravel
 
 ##Prerequisites
 1. Docker
 2. Your favorite IDE or Text Editor
+3. Quickbooks developer account
+4. Quickbooks app
 
 ##Installation
 1. Clone project 
