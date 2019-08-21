@@ -11,26 +11,10 @@ use Illuminate\Support\Facades\Log;
 class OAuthController extends Controller
 {
   private $client;
-  private $clientId;
-  private $secret;
-  private $redirectURL;
-  private $authURL;
-  private $scope;
-  private $responseType;
-  private $accessTokenURL;
-  private $grantType;
 
   public function __construct()
   {
     $this->client = new Client();
-    $this->clientId = env('QBO_CLIENT_ID', false);
-    $this->secret = env('QBO_CLIENT_SECRET', false);
-    $this->redirectURL = env('QBO_REDIRECT_URL', false);
-    $this->authURL = env('QBO_AUTH_URL', false);
-    $this->scope = env('QBO_SCOPE', false);
-    $this->accessTokenURL = env('QBO_ACCESS_TOKEN_URL', false);
-    $this->responseType = env('QBO_RESPONSE_TYPE', false);
-    $this->grantType = env('QBO_AUTH_GRANT_TYPE', false);
   }
 
   public function connect(Request $request)
@@ -38,34 +22,34 @@ class OAuthController extends Controller
     
     
     $parameters = [
-      'client_id' => $this->clientId,
-      'response_type' => $this->responseType,
-      'scope' => $this->scope,
-      'redirect_uri' => $this->redirectURL,
+      'client_id' => config('services.quickbooks.client_id'),
+      'response_type' => config('services.quickbooks.response_type'),
+      'scope' => config('services.quickbooks.scope'),
+      'redirect_uri' => config('services.quickbooks.redirect_uri'),
       'state' => Str::random(32),
     ];
-
-    $this->authURL .= '?' . http_build_query($parameters, null, '&', PHP_QUERY_RFC1738);
-    header("Location: ".$this->authURL);
+    Log::debug($parameters);
+    $authURL = config('services.quickbooks.auth_url');
+    $authURL .= '?' . http_build_query($parameters, null, '&', PHP_QUERY_RFC1738);
+    Log::debug($authURL);
+    header("Location: ".$authURL);
     exit();
   }
 
   public function callback(Request $request)
   {
-    // dump($request->code);
-    // dump($request->state);
-    // dump($request->realmId);
-
-    $tokenHeader = base64_encode($this->clientId . ':' . $this->secret);
+    $clientId = config('services.quickbooks.client_id');
+    $clientSecret = config('services.quickbooks.client_secret');
+    $tokenHeader = base64_encode($clientId . ':' . $clientSecret);
     $tokenHeader = 'Basic ' . $tokenHeader;
 
     try {
       $body = array(
-        'grant_type' => $this->grantType,
+        'grant_type' => config('services.quickbooks.grant_type'),
         'code' => $request->code,
-        'redirect_uri' => $this->redirectURL
+        'redirect_uri' => config('services.quickbooks.redirect_uri')
       );
-
+      
       $headers = [
         'Accept' => 'application/json',
         'Authorization' => $tokenHeader,
@@ -74,8 +58,8 @@ class OAuthController extends Controller
 
       Log::debug($headers);
       Log::debug($body);
-
-      $response = $this->client->request('POST', $this->accessTokenURL, [
+      $accessTokenURL = config('services.quickbooks.token_url');
+      $response = $this->client->request('POST', $accessTokenURL, [
         'headers' => $headers,
         'form_params' => $body
       ]);

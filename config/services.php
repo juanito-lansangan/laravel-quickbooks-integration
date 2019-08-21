@@ -44,4 +44,17 @@ return [
         ],
     ],
 
+    'quickbooks' => [
+        'auth_mode' => env('QBO_AUTH_MODE', 'oauth2'),
+        'client_id' => env('QBO_CLIENT_ID',''),
+        'client_secret' => env('QBO_CLIENT_SECRET', ''),
+        'base_url' => env('QBO_BASE_URL', 'https://sandbox-quickbooks.api.intuit.com'),
+        'auth_url' => env('QBO_AUTH_URL', 'https://appcenter.intuit.com/connect/oauth2'),
+        'token_url' => env('QBO_ACCESS_TOKEN_URL', 'https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer'),
+        'response_type' => 'code',
+        'scope' => env('QBO_SCOPE', 'com.intuit.quickbooks.accounting'),
+        'grant_type' => env('QBO_AUTH_GRANT_TYPE', 'authorization_code'),
+        'redirect_uri' => env('QBO_REDIRECT_URI','http://localhost:8091/qbo-callback')
+    ]
+
 ];
