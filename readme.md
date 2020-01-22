@@ -83,3 +83,5 @@ php artisan migrate
 php artisan db:seed
 ```
 
+##Ngrok expose docker container
+./ngrok http 8091
